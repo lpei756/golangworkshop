@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -28,8 +29,33 @@ import (
 // This means you can get the query and use it in your search!
 // The http.Request parameter contains information about the current HTTP
 // request, look into r.URL to find the parameter!
+
+type GiphyResponse struct {
+	Data []struct {
+		Images struct {
+			FixedWidth struct {
+				Webp string `json:"webp"`
+			} `json:"fixed_width"`
+		} `json:"images"`
+	} `json:"data"`
+}
+
 func Level3Handler(w http.ResponseWriter, r *http.Request) {
 	// FIXME
+	query := r.URL.Query().Get("query")
+	if query == "" {
+		http.Error(w, "Query parameter missing", http.StatusBadRequest)
+		return
+	}
+	gif, err := gifURL(query)
+	if err != nil {
+		http.Error(w, "Failed to fetch gif", http.StatusInternalServerError)
+		return
+	}
+	response := map[string]string{
+		"gif_url": gif,
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 // Step 2/3 only
@@ -42,7 +68,7 @@ func gifURL(search string) (string, error) {
 	urlValues := req.URL.Query()
 	urlValues.Add("q", search)
 	urlValues.Add("limit", "10")
-	urlValues.Add("api_key", "FIXME")
+	urlValues.Add("api_key", "bwIZBORLH1nIn86DAIc5vpTRVFHrZRJC")
 	req.URL.RawQuery = urlValues.Encode()
 
 	resp, err := http.DefaultClient.Do(req)
@@ -66,5 +92,16 @@ func gifURL(search string) (string, error) {
 
 	// FIXME
 
-	return "", fmt.Errorf("unimplemented")
+	var giphyResp GiphyResponse
+	if err := json.NewDecoder(resp.Body).Decode(&giphyResp); err != nil {
+		return "", fmt.Errorf("error decoding response: %w", err)
+	}
+
+	if len(giphyResp.Data) == 0 {
+		return "", fmt.Errorf("no gifs found")
+	}
+
+	return giphyResp.Data[0].Images.FixedWidth.Webp, nil
+
+	// return "", fmt.Errorf("unimplemented")
 }

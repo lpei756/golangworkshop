@@ -18,18 +18,33 @@ import (
 // Step 3: get the color as a constructor parameter (learn how to add parameters to a struct)
 // Update the `NewLevel2` function to accept a color parameter.
 type Level2 struct {
-	// FIXME
+	Position int
+	Color    string
 }
 
-func NewLevel2( /* FIXME (Step 3), see main.go to add parameter */ ) *Level2 {
+// Step 3: Update the NewLevel2 function to accept a color parameter
+func NewLevel2(color string) *Level2 {
 	return &Level2{
-		// FIXME: Initialize your value here
+		Color: color,
 	}
 }
 
 func (l *Level2) colors() []string {
-	// FIXME: For an easy start, copy your code from level 1
-	return nil
+	colorsArray := make([]string, 25)
+	for i := range colorsArray {
+		if i == l.Position {
+			colorsArray[i] = l.Color
+		} else {
+			colorsArray[i] = "pink"
+		}
+	}
+
+	// Step 2: Use defer to update the position at the end of the function
+	defer func() {
+		l.Position = (l.Position + 1) % 25
+	}()
+
+	return colorsArray
 }
 
 // No need to edit below this line

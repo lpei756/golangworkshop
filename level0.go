@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"os/user"
+	// "os/user"
 )
 
 // Hello gopher!
@@ -14,12 +14,12 @@ import (
 // Don't forget to restart your program after each change!
 
 func InfoHandler(w http.ResponseWriter, r *http.Request) {
-	usr, _ := user.Current()
+	// usr, _ := user.Current()
 
 	info := Info{
 		// Update your name and avatar here!
-		Name:      usr.Name,
-		AvatarURL: "https://raw.githubusercontent.com/ashleymcnamara/gophers/master/BLUE_GOPHER.png",
+		Name:      "Lei",
+		AvatarURL: "https://i.keaimeitu.com/up/e1/f4/a4/92d29b6e51af79ad175d0f0595a4f4e1.jpg",
 	}
 
 	json.NewEncoder(w).Encode(info)
